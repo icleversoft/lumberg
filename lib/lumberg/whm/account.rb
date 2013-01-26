@@ -10,7 +10,6 @@ module Lumberg
       # ==== Required
       #  * <tt>:username</tt> - PENDING
       #  * <tt>:domain</tt> - PENDING
-      #  * <tt>:password</tt> - PENDING
       #
       # ==== Optional
       #  * <tt>:plan</tt> - PENDING
@@ -20,9 +19,14 @@ module Lumberg
       #  * <tt>:quota</tt> - PENDING
       #  * <tt>:ip</tt> - PENDING
       #  * <tt>:cgi</tt> - PENDING
+      #  * <tt>:password</tt> - PENDING
       #  * <tt>:</tt> - PENDING
       def create(options = {})
-        server.perform_request('createacct', options)
+        if username_is_valid?(options[:username])
+          server.perform_request('createacct', options)
+        else
+          raise WhmInvalidUserName, 'username must consist of between 1 and 8 characters. It cannot start with a number, or the string test'
+        end
       end
 
       # Permanently removes a cPanel account
@@ -229,7 +233,43 @@ module Lumberg
         server.perform_request('restoreaccount', options.merge(:key => 'metadata'))
       end
 
+      # Enables or disables Digest Authentication for a user account.
+      # Windows Vista, 7, 8 require Digest Authentication support be emabled in order to access the 
+      # Web Disk over a clear text (unencrypted connection)
+      # Available in version 11.34+
+      #
+      # ==== Required
+      #  * <tt>:username</tt> - PENDING
+      #  * <tt>:password</tt> - PENDING
+      #  * <tt>:enabledigest</tt> - PENDING
+      #  * <tt>:api.version</tt> - PENDING
+      def set_digest_auth(options = {})
+        options[:user] = options.delete(:username) if options[:username]
+        server.perform_request('set_digest_auth', options.merge(:key => 'metadata'))
+      end
+
+      # Checks whetehr a cPanel user has digest authentication enabled.
+      # Windows Vista, 7, 8 require Digest Authentication support be emabled in order to access the 
+      # Web Disk over a clear text (unencrypted connection)
+      # Available in version 11.34+
+      #
+      # ==== Required
+      #  * <tt>:username</tt> - PENDING
+      #  * <tt>:api.version</tt> - PENDING
+      def has_digest_auth(options = {})
+        options[:user] = options.delete(:username) if options[:username]
+        server.perform_request('set_digest_auth', options.merge(:key => 'metadata'))
+      end
+
       protected
+      def username_is_valid?(username)
+        if !username.nil? && ((2..8).to_a.include?username.length)
+          return false unless username[/^\d/].nil?
+          return false unless username[/^test/i].nil?
+          return true
+        end
+        return false
+      end
       # Some WHM API methods always return a result, even if the user
       # doesn't actually exist. This makes it seem like your request
       # was successful when it really wasn't
