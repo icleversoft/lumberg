@@ -128,6 +128,42 @@ module Lumberg
         perform_request('nvget', options.merge(:key => 'nvget'))
       end
 
+      def get_access_hash(options = {})
+        perform_request('accesshash', options.merge(:key => 'metadata'))
+      end
+
+      def get_doc_for_key(options = {})
+        perform_request('fetch_doc_key', options.merge(:key => 'doc'))
+      end
+      
+      def validate_ex_conf_syntax(options={})
+        perform_request('validate_exim_configuration_syntax', options.merge(:key => 'validate_exim_configuration_syntax'))
+      end
+      
+      def validate_curr_ex_conf(options={})
+        perform_request('validate_current_installed_exim_config', options.merge(:key => 'validate_current_installed_exim_config'))
+      end
+      
+      def check_rep_ex_conf(options={})
+        perform_request('exim_configuration_check', options.merge(:key => 'exim_configuration_check'))
+      end
+
+      def remove_ex_dry_run_conf(options={})
+        perform_request('remove_in_progress_exim_config_edit', options.merge(:key => 'remove_in_progress_exim_config_edit'))
+      end
+
+      def get_tweak_settings_value_for_option(options={})
+        perform_request('get_tweaksetting', options.merge(:key => 'tweaksetting'))
+      end
+
+      def set_tweak_settings_value_for_option(options={})
+        perform_request('set_tweaksetting', options.merge(:key => 'metadata'))
+      end
+
+      def get_delivery_records(options={})
+        perform_request('emailtrack_search', options.merge(:key => 'records'))
+      end
+
       def reboot
         perform_request('reboot', {:key => "reboot"})
       end
